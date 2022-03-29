@@ -28,12 +28,12 @@ mongoose.connect(process.env.mongoConnection, { useNewUrlParser: true, useUnifie
 // db.once("open", callback => console.log("Connection Successful"));
 // db.on("error", error => console.log(error));
 
-cloudinary.config({
-  cloud_name: 'realitypacefoundation',
-  api_key: '314139385432777',
-  api_secret: 'yRJpupmP_ZYimDgWimVFvnFQdhc',
-  secure: true
-});
+// cloudinary.config({
+//   cloud_name: 'realitypacefoundation',
+//   api_key: '314139385432777',
+//   api_secret: 'yRJpupmP_ZYimDgWimVFvnFQdhc',
+//   secure: true
+// });
 
 app.use(cors());
 app.use(logger('dev'));
