@@ -1,0 +1,11 @@
+node_modules
+*~
+.DS_Store
+.env
+test.rest
+Procfile
+testAdmin.rest
+
+https://realitypace.herokuapp.com/
+
+http://localhost:4000/
