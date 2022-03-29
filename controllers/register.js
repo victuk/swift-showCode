@@ -115,7 +115,6 @@ function registerSubSchoolAdmins(req, res) {
     phoneNumber,
     schoolRole,
     schoolEmail,
-    numberOfAdmins,
     electionType,
     electionTitle,
   } = req.body;
@@ -129,7 +128,6 @@ function registerSubSchoolAdmins(req, res) {
     phoneNumber &&
     schoolRole &&
     schoolEmail &&
-    numberOfAdmins &&
     electionType &&
     electionTitle
   ) {
@@ -140,7 +138,6 @@ function registerSubSchoolAdmins(req, res) {
       phoneNumber,
       schoolRole,
       schoolEmail,
-      numberOfAdmins,
       emailVerified: false,
       suspended: false,
       creator: false,

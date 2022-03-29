@@ -1,18 +1,9 @@
 const jwt = require('jsonwebtoken');
-var nodemailer = require('nodemailer');
+const { transporter } = require("../utils/userUtil");
 
-const { emailService, emailUser, emailPassword } = process.env;
-
-var transporter = nodemailer.createTransport({
-    service: emailService,
-    auth: {
-      user: emailUser,
-      pass: emailPassword
-    }
-  });
 
 async function forgotPassword(req, res) {
-    let emailUser = await regUser.findOne({email: req.body.email}, 'fullName email');
+    let emailUser = await regUser.findOne({email: req.body.email}, 'email');
   if(!emailUser) {
     res.status(404).json({success: false, message: 'No user with this email'});
   } else {
