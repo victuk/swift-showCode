@@ -5,7 +5,6 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require('cors');
 var mongoose = require('mongoose');
-var passport = require('passport');
 var bodyParser = require('body-parser')
 var cloudinary = require('cloudinary').v2;
 
@@ -35,10 +34,6 @@ cloudinary.config({
   api_secret: 'yRJpupmP_ZYimDgWimVFvnFQdhc',
   secure: true
 });
-
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
 
 app.use(cors());
 app.use(logger('dev'));
