@@ -296,7 +296,7 @@ function verifyEmail(req, res) {
 
             res
               .status(200)
-              .json({ successful: true, message: "Email Verified" });
+              .json({ successful: true, message: "Email Verified", loginToken: user.creatorId });
           }
         );
       } else {
