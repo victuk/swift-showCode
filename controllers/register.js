@@ -291,6 +291,29 @@ function verifyEmail(req, res) {
           function (err, user) {
             if (err) console.log(err);
 
+            var mailOptions = {
+              from: "Swift Vote <no-reply@swiftvote.com>",
+              to: user.schoolEmail,
+              subject: "Swift Vote - Login Details",
+              html: `
+          <div style="padding: 20px">
+              <h1 style="background-color: blue; white: color: white;">Swift Vote OTP</h1>
+              Your Login Details are as follows:
+                <div>
+                    <h2>Email: ${user.schoolEmail}</h2>
+                    <h2>Login ID: ${user.creatorId}</h2>
+                </div>
+              <style>
+                    div, a {
+                      padding: 20px 10px;
+                    }
+              </style>
+          </div>
+          `,
+            };
+  
+            transporter.sendMail(mailOptions);
+
             res
               .status(200)
               .json({ successful: true, message: "Email Verified", loginToken: user.creatorId });
