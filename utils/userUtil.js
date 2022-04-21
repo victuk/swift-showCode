@@ -24,7 +24,7 @@ const createUser = (newUser, callback) => {
 };
 
 const getUserByEmail = (email, callback) => {
-    const query = { schoolEmail: email };
+    const query = { email };
     register.findOne(query, callback);
 };
 

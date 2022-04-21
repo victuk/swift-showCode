@@ -1,16 +1,23 @@
-const User = require('../models/register');
+const { register } = require('../models/register');
 
 function isRestricted(req, res, next) {
-    User.findById(req.decoded.id, 'status', (err, user) => {
+    register.findById(req.decoded.id, 'status', (err, user) => {
         if (err) {
             return console.log(err);
         }
-        if (user.status == 'restricted') {
+        else if (user.emailVerified == false) {
             res.json({
                 success: false,
                 message: "Restricted, confirm your email address."
             });
-        } else {
+        }
+        else if (user.suspended == true) {
+            res.json({
+                success: false,
+                message: "You have been suspended from voting."
+            });
+        }
+        else {
             next();
         }
         

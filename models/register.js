@@ -2,40 +2,30 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const RegisterSchoolAdminSchema = new Schema({
+const universalRegister = new Schema({
     schoolName: String,
     surName: String,
-    initials: String,
+    otherNames: String,
     phoneNumber: String,
     schoolRole: String,
     schoolEmail: String,
-    numberOfAdmins: Number,
-    electionType: String,
-    creator: Boolean,
-    creatorId: String,
-    electionTitle: String,
-    adminId: String,
-    electoralType: {
-        type: String,
-        enum: ['firstPassThePost', 'plurality']
-    },
-    pollAccess: {
-        type: String,
-        enum: ['openAccessPool', 'closedAccessPool']
-    },
-    duration: String,
+    publicId: String,
     email: String,
     picture: String,
-    publicId: String,
-    skinType: String,
-    gender: String,
+    gender: {
+        type: String,
+        enum: ['male', 'female']
+    },
+    regNumber: String,
     emailVerified: Boolean,
     suspended: Boolean,
     password: String,
-    role: String
+    role: String,
+    createDate: Date,
+    modifyDate: Date
 });
 
-const register = mongoose.model('User', RegisterSchoolAdminSchema);
+const register = mongoose.model('User', universalRegister);
 
 
 

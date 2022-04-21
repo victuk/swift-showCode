@@ -1,13 +1,15 @@
 var { register } = require("../models/register");
 const jwt = require("jsonwebtoken");
+const bcrypt = require('bcryptjs');
 require("dotenv").config();
 const {
   getUserByEmail,
   createUser,
-  generateRandomString,
   generateOtp,
   transporter,
 } = require("../utils/userUtil");
+
+let randomUUID = require('crypto');
 
 let regSecretKey = process.env.registerSecretKey;
 
@@ -15,45 +17,44 @@ function registerSchoolAdmins(req, res) {
   const {
     schoolName,
     surName,
-    initials,
+    otherNames,
+    gender,
     phoneNumber,
     schoolRole,
-    schoolEmail,
-    numberOfAdmins,
-    electionType,
-    electionTitle,
+    email,
+    password
   } = req.body;
 
   if (
     schoolName &&
     surName &&
-    initials &&
+    otherNames &&
+    gender &&
     phoneNumber &&
     schoolRole &&
-    schoolEmail &&
-    numberOfAdmins &&
-    electionType &&
-    electionTitle
+    password &&
+    email
   ) {
     const newUser = new register({
       schoolName,
       surName,
-      initials,
+      otherNames,
       phoneNumber,
       schoolRole,
-      schoolEmail,
-      numberOfAdmins,
+      email,
+      gender,
+      publicId: null,
+      picture: null,
+      password,
       emailVerified: false,
       suspended: false,
-      creator: true,
-      creatorId: generateRandomString(16),
-      electionType,
-      electionTitle,
       role: "schoolAdmin",
       createDate: Date.now(),
+      modifyDate: Date.now()
     });
 
-    getUserByEmail(schoolEmail, (err, user) => {
+
+    getUserByEmail(email, (err, user) => {
       if (err) {
         console.log(err);
       }
@@ -65,7 +66,7 @@ function registerSchoolAdmins(req, res) {
             });
           }
           let otp = generateOtp();
-          let payload = { id: user._id, email: user.schoolEmail, otp };
+          let payload = { id: user._id, email: user.email, otp };
 
           const regToken = jwt.sign(payload, regSecretKey, {
             expiresIn: 5000,
@@ -73,14 +74,18 @@ function registerSchoolAdmins(req, res) {
 
           var mailOptions = {
             from: "Swift Vote <no-reply@swiftvote.com>",
-            to: user.schoolEmail,
+            to: user.email,
             subject: "Swift Vote - Admin Verification Code",
             html: `
             <div style="padding: 20px">
                 <h1 style="background-color: blue; white: color: white;">Swift Vote OTP</h1>
                 Your OTP is:
                   <div>
-                      <h2>${otp}</h2>
+                  <h2>${otp}</h2>
+                  <div> Register Token: ${regToken} </div>
+                  <div>
+                  Send this register token and the otp as registration body
+                  </div>
                   </div>
                 <style>
                       div, a {
@@ -107,117 +112,27 @@ function registerSchoolAdmins(req, res) {
   }
 }
 
-function registerSubSchoolAdmins(req, res) {
-  const {
-    schoolName,
-    surName,
-    initials,
-    phoneNumber,
-    schoolRole,
-    schoolEmail,
-    electionType,
-    electionTitle,
-  } = req.body;
-
-  const { creatorId } = req.params;
-
-  if (
-    schoolName &&
-    surName &&
-    initials &&
-    phoneNumber &&
-    schoolRole &&
-    schoolEmail &&
-    electionType &&
-    electionTitle
-  ) {
-    const newUser = new register({
-      schoolName,
-      surName,
-      initials,
-      phoneNumber,
-      schoolRole,
-      schoolEmail,
-      emailVerified: false,
-      suspended: false,
-      creator: false,
-      creatorId,
-      electionType,
-      electionTitle,
-      role: "schoolAdmin",
-      createDate: Date.now(),
-    });
-
-    getUserByEmail(schoolEmail, (err, user) => {
-      if (err) {
-        console.log(err);
-      }
-      if (!user) {
-        createUser(newUser, function (error, user) {
-          if (error) {
-            res.status(422).json({
-              message: "Something went wrong!",
-            });
-          }
-          let otp = generateOtp();
-          let payload = { id: user._id, email: user.schoolEmail, otp };
-
-          const regToken = jwt.sign(payload, regSecretKey, {
-            expiresIn: 5000,
-          });
-
-          var mailOptions = {
-            from: "Swift Vote <no-reply@swiftvote.com>",
-            to: user.schoolEmail,
-            subject: "Swift Vote - Co-admin Verification Code",
-            html: `
-        <div style="padding: 20px">
-            <h1 style="background-color: blue; white: color: white;">Swift Vote OTP</h1>
-            Your OTP is:
-              <div>
-                  <h2>${otp}</h2>
-              </div>
-            <style>
-                  div, a {
-                    padding: 20px 10px;
-                  }
-            </style>
-        </div>
-        `,
-          };
-
-          transporter.sendMail(mailOptions);
-
-          res.json({ successful: true, message: "ok", user, regToken });
-        });
-      } else {
-        res.json({ successful: false, message: "This email is already used" });
-      }
-    });
-  } else {
-    res.json({
-      successful: false,
-      message: "Your input details are not complete.",
-    });
-  }
-}
-
 function registerVoters(req, res) {
-  const { email, fullName, skinType, gender, password } = req.body;
+  const { email, surName, otherNames, regNumber, department, gender, password } = req.body;
 
-  if (email && fullName && skinType && gender && password) {
+  const uniqueId = randomUUID.randomUUID().split('').filter(letter => {return letter != '-'}).join("");
+
+  if (email && surName && otherNames && regNumber && gender && password) {
     const newUser = new register({
-      fullName,
+      surName,
+      otherNames,
       email,
-      picture: "none",
-      publicId: "none",
+      picture: null,
+      publicId: null,
       gender,
-      skinType,
-      password,
+      regNumber,
+      department,
       emailVerified: false,
       suspended: false,
       role: "voter",
+      password,
       createDate: Date.now(),
+      modifyDate: Date.now()
     });
 
     getUserByEmail(email, (err, user) => {
@@ -246,10 +161,20 @@ function registerVoters(req, res) {
                 Your OTP is:
                   <div>
                       <h2>${otp}</h2>
+                      <div> Register Token: ${regToken} </div>
+                      <div>
+                      Send this register token and the otp as registration body
+                      </div>
                   </div>
                 <style>
                       div, a {
                         padding: 20px 10px;
+                      }
+                      .verify-button {
+                        background-color: blue;
+                        color: white;
+                        padding: 20px;
+                        text-decoration: none;
                       }
                 </style>
             </div>
@@ -258,7 +183,7 @@ function registerVoters(req, res) {
 
           transporter.sendMail(mailOptions);
 
-          res.json({ successful: true, message: "ok", user });
+          res.json({ successful: true, message: "ok", user, regToken, protocol: req.protocol, hostname: req.hostname });
         });
       } else {
         res.json({ successful: false, message: "This email is already used" });
@@ -273,7 +198,7 @@ function registerVoters(req, res) {
 }
 
 function verifyEmail(req, res) {
-  const vToken = req.params.verifyToken;
+  const vToken = req.body.verifyToken;
   const vDigits = req.body.verifyDigits;
   jwt.verify(vToken, regSecretKey, function (err, decoded) {
     if (err) {
@@ -290,33 +215,57 @@ function verifyEmail(req, res) {
           },
           function (err, user) {
             if (err) console.log(err);
-
-            var mailOptions = {
-              from: "Swift Vote <no-reply@swiftvote.com>",
-              to: user.schoolEmail,
-              subject: "Swift Vote - Login Details",
-              html: `
-          <div style="padding: 20px">
-              <h1 style="background-color: blue; white: color: white;">Swift Vote OTP</h1>
-              Your Login Details are as follows:
-                <div>
-                    <h2>Email: ${user.schoolEmail}</h2>
-                    <h2>Login ID: ${user.creatorId}</h2>
-                </div>
-              <style>
-                    div, a {
-                      padding: 20px 10px;
-                    }
-              </style>
-          </div>
-          `,
-            };
+            if(user.role == 'voter') {
+              var mailOptions = {
+                from: "Swift Vote <no-reply@swiftvote.com>",
+                to: user.email,
+                subject: "Swift Vote - Email Verified",
+                html: `
+            <div style="padding: 20px">
+                <h1 style="background-color: blue; white: color: white;">Swift Vote Login Details</h1>
+                Your Email is verified. <br> Click this button to login
+                #Link to voter's page to login
+                  <div>
+                  </div>
+                <style>
+                      div, a {
+                        padding: 20px 10px;
+                      }
+                </style>
+            </div>
+            `,
+              };
+              transporter.sendMail(mailOptions);
   
-            transporter.sendMail(mailOptions);
-
             res
               .status(200)
               .json({ successful: true, message: "Email Verified", loginToken: user.creatorId });
+            } else if (user.role == 'schoolAdmin') {
+              var mailOptions = {
+                from: "Swift Vote <no-reply@swiftvote.com>",
+                to: user.email,
+                subject: "Swift Vote - Email Verified",
+                html: `
+            <div style="padding: 20px">
+                <h1 style="background-color: blue; white: color: white;">Swift Vote Login Details</h1>
+                Your Email is verified.
+                #Link to admin panel here
+                  <div>
+                  </div>
+                <style>
+                      div, a {
+                        padding: 20px 10px;
+                      }
+                </style>
+            </div>
+            `,
+              };
+              transporter.sendMail(mailOptions);
+  
+            res
+              .status(200)
+              .json({ successful: true, message: "Email Verified", loginToken: user.creatorId });
+            }
           }
         );
       } else {
@@ -331,6 +280,5 @@ function verifyEmail(req, res) {
 module.exports = {
   registerSchoolAdmins,
   registerVoters,
-  verifyEmail,
-  registerSubSchoolAdmins,
+  verifyEmail
 };

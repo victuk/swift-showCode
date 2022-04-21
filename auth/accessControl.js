@@ -45,7 +45,7 @@ const hasAccess = {
         //         });
         //     }
     },
-    staffAndAdmin (req, res, next) {
+    schoolAdmins (req, res, next) {
         if (req.decoded.role == theroles.staff ||
             req.decoded.role == theroles.admin) {
                 next();
@@ -56,7 +56,7 @@ const hasAccess = {
                 });
             }
     },
-    managerAndAdmin (req, res, next) {
+    voters (req, res, next) {
         if (req.decoded.role == theroles.manager ||
             req.decoded.role == theroles.admin) {
                 next();
@@ -67,7 +67,7 @@ const hasAccess = {
                 });
             }
     },
-    adminOnly (req, res, next) {
+    votersAndSchoolAdmins (req, res, next) {
         if (req.decoded.role == theroles.admin) {
                 next();
                 
@@ -78,7 +78,7 @@ const hasAccess = {
                 });
             }
     },
-    staffOnly (req, res, next) {
+    swiftVoteAdmin (req, res, next) {
         if (req.decoded.role == theroles.staff) {
                 next();
             } else {
@@ -87,29 +87,8 @@ const hasAccess = {
                     message: "Not Authorized"
                 });
             }
-    },
-    driverOnly (req, res, next) {
-        if (req.decoded.role == theroles.driver) {
-                next();
-            } else {
-                res.json({
-                    success: false,
-                    message: "Not Authorized"
-                });
-            }
-    },
-    userOnly (req, res, next) {
-        if (req.decoded.role == theroles.user) {
-                next();
-            } else {
-                res.json({
-                    success: false,
-                    message: "Not Authorized"
-                });
-            }
-    },
-
+    }
 }
 
-module.exports = hasAccess;
-module.exports.theroles = theroles;
+module.exports = { hasAccess, theroles };
+

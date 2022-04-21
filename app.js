@@ -12,7 +12,7 @@ var cloudinary = require('cloudinary').v2;
 var indexRoute = require('./routes/index');
 var votersRoute = require('./routes/voters');
 var registerRoute = require('./routes/register');
-var adminRoute = require('./routes/admin');
+var adminRoute = require('./routes/swiftvoteadmin');
 var schoolAdminRoute = require('./routes/schoolAdmin');
 var loginRoute = require('./routes/login');
 var pwRoute = require('./routes/forgotPassword');
@@ -49,11 +49,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 app.use('/v1/voters', votersRoute);
-app.use('/v1/admin', adminRoute);
+app.use('/v1/swiftvoteadmin', adminRoute);
 app.use('/v1/schooladmin', schoolAdminRoute);
 app.use('/v1/register', registerRoute);
 app.use('/v1/login', loginRoute);
-app.use('/v1/forgotresetpw', pwRoute);
+app.use('/v1/password', pwRoute);
 app.use('/v1/', indexRoute);
 
 
@@ -69,8 +69,9 @@ app.use(function(err, req, res, next) {
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
   // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+  console.log(err);
+  res.status(err.status || 500)
+  .json({error: err.message});
 });
 
 module.exports = app;
