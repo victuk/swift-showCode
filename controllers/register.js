@@ -127,6 +127,7 @@ function registerVoters(req, res) {
       gender,
       regNumber,
       department,
+      faculty,
       emailVerified: false,
       suspended: false,
       role: "voter",
@@ -198,8 +199,7 @@ function registerVoters(req, res) {
 }
 
 function verifyEmail(req, res) {
-  const vToken = req.body.verifyToken;
-  const vDigits = req.body.verifyDigits;
+  const {verifyToken: vToken, verifyDigits: vDigits} = req.body;
   jwt.verify(vToken, regSecretKey, function (err, decoded) {
     if (err) {
       return res.json({

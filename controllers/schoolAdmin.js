@@ -10,8 +10,7 @@ function createElection(req, res) {
     electoralType,
     schoolEmail,
     pollAccess,
-    duration,
-    numberOfAdmins,
+    duration
   } = req.body;
 
   if (
@@ -20,8 +19,7 @@ function createElection(req, res) {
     pollAccess &&
     schoolEmail &&
     pollAccess &&
-    duration &&
-    numberOfAdmins
+    duration
   ) {
     const newStudentElection = new studentElection({
       electionTitle,
@@ -35,7 +33,6 @@ function createElection(req, res) {
       contestants: [],
       adminApprovedVoters: [],
       schoolEmail,
-      numberOfAdmins,
       verifiedElection: false,
       createDate: Date.now(),
       modifyDate: Date.now(),
@@ -265,6 +262,60 @@ function getSubAdminsList(req, res) {
   createElection.findById(electionId, "electionTitle schoolEmail subAdmins");
 }
 
+async function getSchoolAdminProfile(req, res) {
+  const schoolAdminId = req.decoded.id;
+  const schoolAdminProfileDetail = await register.findById(schoolAdminId, 'surName otherNames phoneNumber email gender picture schoolRole');
+  res.json({
+    successful: true,
+    schoolAdminProfileDetail
+  });
+}
+
+function changeProfile(req, res) {
+  const {
+    schoolName,
+    surName,
+    otherNames,
+    gender,
+    phoneNumber,
+    schoolRole,
+    email
+  } = req.body;
+  register.findByIdAndUpdate(req.decoded.id, {
+    schoolName,
+    surName,
+    otherNames,
+    gender,
+    phoneNumber,
+    schoolRole,
+    email
+  }, function(error, response) {
+    if(error) throw error;
+    res.json({successful: true, message: 'ok'});
+  });
+}
+
+function changeProfilePicture(req, res) {
+  const { picture } = req.body;
+  register.findByIdAndUpdate(req.decoded.id, {
+    picture
+  }, function(error, response) {
+    if(error) throw error;
+    res.json({successful: true, message: 'ok'});
+  });
+}
+
+async function getElectionByGenId(req, res) {
+  const { electionGenID } = req.body;
+  try {
+      const electionDetails = register.findOne({electionGenID});
+      res.json({successful: true, electionDetails });
+  } catch (error) {
+      console.log(error);
+      res.json({successful: false, message: "an error occurred"});
+  }
+}
+
 module.exports = {
   createElection,
   shareElectionLinkToSubAdmins,
@@ -274,4 +325,8 @@ module.exports = {
   getApprovedVotersList,
   getContestantsList,
   getSubAdminsList,
+  getSchoolAdminProfile,
+  changeProfile,
+  changeProfilePicture,
+  getElectionByGenId
 };

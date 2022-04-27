@@ -57,8 +57,6 @@ async function vote(req, res) {
     
         
     }
-
-    
 }
 
 async function getElectionByGenId(req, res) {
@@ -70,7 +68,51 @@ async function getElectionByGenId(req, res) {
         console.log(error);
         res.json({successful: false, message: "an error occurred"});
     }
-    
 }
 
-module.exports = { vote, getElectionByGenId };
+async function getVotersProfile(req, res) {
+    const voterId = req.decoded.id;
+    const voterDetails = await register.findById(voterId, 'surName otherNames picture gender department faculty regNumber email');
+    res.json({
+        successful: true,
+        voterDetails
+    });
+}
+
+function changeProfile(req, res) {
+    const {
+      schoolName,
+      surName,
+      otherNames,
+      gender,
+      phoneNumber,
+      schoolRole,
+      password,
+      email
+    } = req.body;
+    register.findByIdAndUpdate(req.decoded.id, {
+      schoolName,
+      surName,
+      otherNames,
+      gender,
+      phoneNumber,
+      schoolRole,
+      password,
+      email
+    }, function(error, response) {
+      if(error) throw error;
+      res.json({successful: true, message: 'ok'});
+    });
+  }
+  
+  function changeProfilePicture(req, res) {
+    const { picture } = req.body;
+    register.findByIdAndUpdate(req.decoded.id, {
+      picture
+    }, function(error, response) {
+      if(error) throw error;
+      res.json({successful: true, message: 'ok'});
+    });
+  }
+
+module.exports = { vote, getElectionByGenId, getVotersProfile, changeProfile, changeProfilePicture };

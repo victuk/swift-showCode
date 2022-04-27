@@ -24,7 +24,6 @@ const studentElectionSchema = new Schema({
     contestants: Object,
     schoolEmail: String,
     verifiedElection: Boolean,
-    numberOfAdmins: Number,
     createDate: Date,
     modifyDate: Date
 });

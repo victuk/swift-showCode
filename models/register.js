@@ -11,6 +11,8 @@ const universalRegister = new Schema({
     schoolEmail: String,
     publicId: String,
     email: String,
+    faculty: String,
+    department: String,
     picture: String,
     gender: {
         type: String,
