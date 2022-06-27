@@ -1,14 +1,27 @@
 const bcryptjs = require('bcryptjs');
 var nodemailer = require('nodemailer');
 const { register } = require('../models/register');
+require('dotenv').config();
 
 const { emailService, emailUser, emailPassword } = process.env;
 
 var transporter = nodemailer.createTransport({
-    service: emailService,
+    host: "smtp.gmail.com",
+    // service: emailService,
+    port: 465,
+    secure: true,
     auth: {
       user: emailUser,
       pass: emailPassword
+    }
+  });
+
+// verify connection configuration
+transporter.verify(function (error, success) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Server is ready to send e-mails");
     }
   });
 

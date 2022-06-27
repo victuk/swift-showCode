@@ -8,7 +8,6 @@ var mongoose = require('mongoose');
 var bodyParser = require('body-parser')
 var cloudinary = require('cloudinary').v2;
 
-
 var indexRoute = require('./routes/index');
 var votersRoute = require('./routes/voters');
 var registerRoute = require('./routes/register');
@@ -20,7 +19,7 @@ require('dotenv').config();
 var app = express();
 
 
-mongoose.connect(process.env.mongoConnection, { useNewUrlParser: true, useUnifiedTopology: true}, function(err) {
+mongoose.connect(process.env.mongoConnection, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false}, function(err) {
   if(err) {console.log(err)}
   else {console.log("Connected")}
 });
